@@ -10,9 +10,10 @@
 ###########################################
 ##	Help Information
 info="""
-Usgae: $0 [clear|run] \n
+Usgae: $0 [clear|run|cov] \n
 - clear: clear my workstation \n
-- run: simulation icshape Pipeline \n\n
+- run: simulation icshape Pipeline \n
+- cov: converse icshape to VARNA color map file format \n\n
 There are 9 Steps in icSHAPE pipeline: \n
 \t1. Reads Collapses \n
 \t2. Reads Trimming \n
@@ -39,7 +40,7 @@ if [ $1 = 'clear' ]; then
 	if [ -e collapes ]; then rm -rf collapes; fi
 	if [ -e trimming ]; then rm -rf trimming; fi
 	if [ -e bowtie ]; then rm -rf bowtie; fi
-	if [ -e 45SrRNA.icSHAPE ]; then rm -rf 45SrRNA.icSHAPE; fi
+	if [ -e rRNA.icSHAPE ]; then rm -rf rRNA.icSHAPE; fi
 	if [ -e enrichment ]; then rm -rf enrichment; fi
 	if [ -e index ]; then rm -rf index; fi
 	if [ -e normalize ]; then rm -rf normalize; fi
@@ -47,6 +48,7 @@ if [ $1 = 'clear' ]; then
 	if [ -e rt ]; then rm -rf rt; fi
 	if [ -e trimming ]; then rm -rf trimming; fi
 	if [ -e combineRT ]; then rm -rf combineRT; fi
+	if [ -e rRNA.varna ]; then rm rRNA.varna; fi
 	exit
 fi
 ###########################################
@@ -55,12 +57,15 @@ fi
 ##	Simulation icSHAPE Pipeline
 if [ $1 = 'run' ]; then
 	BIN=./icSHAPE/scripts
-	ADAPTER=~/icSHAPE/data/adapter/TruSeq2-SE.fa  
+	ADAPTER=./icSHAPE/data/adapter/TruSeq2-SE.fa  
 	D1=./DATA/fq/D1.fq
 	D2=./DATA/fq/D2.fq
 	N1=./DATA/fq/N1.fq
 	N2=./DATA/fq/N2.fq
-	FA=./DATA/fa/45SrRNA.fa
+	#FA=./DATA/fa/5SrRNA.fa
+	FA=./DATA/fa/18SrRNA.fa
+	#FA=./DATA/fa/45SrRNA.fa
+
 
 
 	##	1. Reads Collapses
@@ -130,11 +135,29 @@ if [ $1 = 'run' ]; then
 	##	8. calcErichment
 	if [ -e enrichment ]; then rm -rf enrichment; fi
 	mkdir enrichment
-	$BIN/calcEnrich.pl -f ./normalize/N.norm.rt -b ./normalize/D.norm.rt -o ./enrichment/45SrRNA.erichment -w factor5:scaling1 -y 10 -x 0.25 -e complex
+	$BIN/calcEnrich.pl -f ./normalize/N.norm.rt -b ./normalize/D.norm.rt -o ./enrichment/rRNA.erichment -w factor5:scaling1 -y 10 -x 0.25 -e complex
 
 	##	9. Filter Erichment
-	$BIN/filterEnrich.pl -i ./enrichment/45SrRNA.erichment -o 45SrRNA.icSHAPE -t 100 -T 2 -s 5 -e 30
+	$BIN/filterEnrich.pl -i ./enrichment/rRNA.erichment -o rRNA.icSHAPE -t 100 -T 2 -s 5 -e 30
 fi
 ###########################################
 
-
+###########################################                                  
+##	icSAHPE Value to structure values
+if [ $1 = 'cov' ]; then
+	#cat rRNA.icSHAPE | sed 's/\t/\n/g' | sed -e '1,3d' | sed 's/NULL/0.000/g' > rRNA.varna
+	cat rRNA.icSHAPE | awk '
+	{split($0, Arr, "\t"); 
+		i = 4
+		while(i <= length(Arr))
+		{
+			if(Arr[i] == "NULL")
+				print "0.000"
+			else
+				print Arr[i]
+			i += 1
+		}
+	}
+	' > rRNA.varna
+fi
+###########################################
