@@ -55,6 +55,10 @@ fi
 
 ###########################################
 ##	Simulation icSHAPE Pipeline
+
+#FA=./DATA/fa/5SrRNA.fa
+FA=./DATA/fa/18SrRNA.fa
+#FA=./DATA/fa/45SrRNA.fa
 if [ $1 = 'run' ]; then
 	BIN=./icSHAPE/scripts
 	ADAPTER=./icSHAPE/data/adapter/TruSeq2-SE.fa  
@@ -62,10 +66,6 @@ if [ $1 = 'run' ]; then
 	D2=./DATA/fq/D2.fq
 	N1=./DATA/fq/N1.fq
 	N2=./DATA/fq/N2.fq
-	#FA=./DATA/fa/5SrRNA.fa
-	FA=./DATA/fa/18SrRNA.fa
-	#FA=./DATA/fa/45SrRNA.fa
-
 
 
 	##	1. Reads Collapses
@@ -159,5 +159,8 @@ if [ $1 = 'cov' ]; then
 		}
 	}
 	' > rRNA.varna
+	cat $FA
+	DotBrack=$(echo $FA | sed 's/\.fa/\.dotbrak/')
+	cat $DotBrack
 fi
 ###########################################
