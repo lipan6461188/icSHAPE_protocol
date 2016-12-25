@@ -55,7 +55,7 @@ fi
 ##	Simulation icSHAPE Pipeline
 if [ $1 = 'run' ]; then
 	BIN=./icSHAPE/scripts
-	ADAPTER=~/lipan/icSHAPE/icSHAPE/data/adapter/TruSeq2-SE.fa  
+	ADAPTER=~/icSHAPE/data/adapter/TruSeq2-SE.fa  
 	D1=./DATA/fq/D1.fq
 	D2=./DATA/fq/D2.fq
 	N1=./DATA/fq/N1.fq
